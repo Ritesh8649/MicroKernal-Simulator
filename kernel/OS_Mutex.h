@@ -1,26 +1,21 @@
 #ifndef OS_MUTEX_H
 #define OS_MUTEX_H
 
-#include <windows.h>
+#include <mutex>
 
 class OS_Mutex {
 private:
-    CRITICAL_SECTION cs;
+    std::mutex mtx;
 public:
-    OS_Mutex() {
-        InitializeCriticalSection(&cs);
-    }
-    
-    ~OS_Mutex() {
-        DeleteCriticalSection(&cs);
-    }
+    OS_Mutex() {}
+    ~OS_Mutex() {}
     
     void lock() {
-        EnterCriticalSection(&cs);
+        mtx.lock();
     }
     
     void unlock() {
-        LeaveCriticalSection(&cs);
+        mtx.unlock();
     }
 };
 
@@ -38,4 +33,3 @@ public:
 };
 
 #endif
-

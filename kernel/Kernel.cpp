@@ -55,6 +55,9 @@ void Kernel::processMessages() {
         else if (msg.type == "request_capability") {
             securityServer.handleMessage(msg);
         }
+        else if (msg.type == "mem_status") {
+            memoryService.handleMessage(msg);
+        }
         else if (msg.type == "kill_service") {
             OS_LockGuard lock(printMutex);
             cout << "[WATCHDOG] CRITICAL FAULT DETECTED: " << msg.data << " crashed!\n";
@@ -68,7 +71,10 @@ void Kernel::processMessages() {
     }
 }
 
-DWORD WINAPI KernelSchedulerBody(LPVOID param) {
+#include <chrono>
+#include <thread>
+
+void* KernelSchedulerBody(void* param) {
     Kernel* k = (Kernel*)param;
     while (k->isRunning()) {
         Message interruptMsg;
@@ -76,9 +82,9 @@ DWORD WINAPI KernelSchedulerBody(LPVOID param) {
         interruptMsg.type = "interrupt";
         interruptMsg.data = "timer";
         k->sendMessage(interruptMsg);
-        Sleep(1000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
-    return 0;
+    return nullptr;
 }
 
 void Kernel::startScheduler() {

@@ -8,6 +8,7 @@
 class MemoryService : public Service {
 private:
     std::vector<bool> physicalMemory; // false = free, true = used
+    std::map<int, std::vector<int>> processMemoryMap;
     int pageSize;
     int totalPages;
     int usedPages;
